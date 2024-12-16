@@ -18,6 +18,11 @@ export default defineComponent({
     const isLoading = ref(true);
     const search = ref("");
     const selectedCompany = ref("");
+    const selectedGeoLocation = ref("");
+    const selectedJobType = ref("");
+    const selectedIndustry = ref("");
+    const selectedLevel = ref("");
+
     const headers = ref([
       { title: "Title", key: "title" },
       { title: "Geolocation", key: "geoLocation" },
@@ -36,16 +41,38 @@ export default defineComponent({
     });
 
     const jobs = computed(() => {
-      if (selectedCompany.value) {
-        return jobStore.jobs.filter(
-          (job) => job.companyName === selectedCompany.value
+      return jobStore.jobs.filter((job) => {
+        return (
+          (!selectedCompany.value ||
+            job.companyName === selectedCompany.value) &&
+          (!selectedGeoLocation.value ||
+            job.geoLocation === selectedGeoLocation.value) &&
+          (!selectedJobType.value || job.type === selectedJobType.value) &&
+          (!selectedIndustry.value ||
+            job.industry === selectedIndustry.value) &&
+          (!selectedLevel.value || job.level === selectedLevel.value)
         );
-      }
-      return jobStore.jobs;
+      });
     });
 
     const companyNames = computed(() => {
       return [...new Set(jobStore.jobs.map((job) => job.companyName))];
+    });
+
+    const geoLocations = computed(() => {
+      return [...new Set(jobStore.jobs.map((job) => job.geoLocation))];
+    });
+
+    const jobTypes = computed(() => {
+      return [...new Set(jobStore.jobs.map((job) => job.type))];
+    });
+
+    const industries = computed(() => {
+      return [...new Set(jobStore.jobs.map((job) => job.industry))];
+    });
+
+    const levels = computed(() => {
+      return [...new Set(jobStore.jobs.map((job) => job.level))];
     });
 
     const openModal = (job: JobVacancy) => {
@@ -67,6 +94,14 @@ export default defineComponent({
       openModal,
       companyNames,
       selectedCompany,
+      geoLocations,
+      selectedGeoLocation,
+      jobTypes,
+      selectedJobType,
+      industries,
+      selectedIndustry,
+      levels,
+      selectedLevel,
     };
   },
 });
@@ -75,12 +110,38 @@ export default defineComponent({
 <template>
   <v-card title="Job Vacancies" flat>
     <template v-slot:text>
-      <SearchField v-model:search="search" />
-      <JobVacancyFilter
-        label="Filter by Company"
-        :items="companyNames"
-        v-model="selectedCompany"
-      />
+      <div>
+        <div class="search-container">
+          <SearchField v-model:search="search" />
+        </div>
+        <div class="filters-container">
+          <JobVacancyFilter
+            label="Filter by Company"
+            :items="companyNames"
+            v-model="selectedCompany"
+          />
+          <JobVacancyFilter
+            label="Filter by Geolocation"
+            :items="geoLocations"
+            v-model="selectedGeoLocation"
+          />
+          <JobVacancyFilter
+            label="Filter by Job Type"
+            :items="jobTypes"
+            v-model="selectedJobType"
+          />
+          <JobVacancyFilter
+            label="Filter by Industry"
+            :items="industries"
+            v-model="selectedIndustry"
+          />
+          <JobVacancyFilter
+            label="Filter by Level"
+            :items="levels"
+            v-model="selectedLevel"
+          />
+        </div>
+      </div>
     </template>
 
     <v-data-table
@@ -102,3 +163,17 @@ export default defineComponent({
     />
   </v-card>
 </template>
+
+<style scoped>
+.search-container {
+  width: 40%;
+  margin-bottom: 1rem;
+}
+
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+</style>

@@ -29,7 +29,6 @@ export default defineComponent({
     );
 
     watch(selected, (newVal) => {
-      console.log("Selected value:", newVal);
       emit("update:modelValue", newVal);
     });
 
