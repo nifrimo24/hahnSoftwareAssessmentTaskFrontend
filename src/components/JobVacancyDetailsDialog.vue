@@ -93,7 +93,14 @@ export default defineComponent({
       </v-expand-transition>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="secondary" @click="closeModal">Close</v-btn>
+        <v-btn
+          color="secondary"
+          @click="
+            closeModal();
+            show = false;
+          "
+          >Close</v-btn
+        >
         <v-btn @click="navigateToJobUrl" class="apply-button">
           <v-icon left>mdi-check</v-icon>
           Apply
