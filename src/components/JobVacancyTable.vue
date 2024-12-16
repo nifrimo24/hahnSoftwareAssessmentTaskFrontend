@@ -1,20 +1,23 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref, computed } from "vue";
+import { defineComponent, onMounted, ref, computed, watch } from "vue";
 import { useJobStore } from "../stores/jobVacancyStore";
 import { JobVacancy } from "../types";
 import SearchField from "./SearchField.vue";
 import JobVacancyDetailsDialog from "@/components/JobVacancyDetailsDialog.vue";
+import JobVacancyFilter from "@/components/JobVacancyFilter.vue";
 
 export default defineComponent({
   name: "JobVacancyTable",
   components: {
     JobVacancyDetailsDialog,
     SearchField,
+    JobVacancyFilter,
   },
   setup() {
     const jobStore = useJobStore();
     const isLoading = ref(true);
     const search = ref("");
+    const selectedCompany = ref("");
     const headers = ref([
       { title: "Title", key: "title" },
       { title: "Geolocation", key: "geoLocation" },
@@ -32,12 +35,27 @@ export default defineComponent({
       isLoading.value = false;
     });
 
-    const jobs = computed(() => jobStore.jobs);
+    const jobs = computed(() => {
+      if (selectedCompany.value) {
+        return jobStore.jobs.filter(
+          (job) => job.companyName === selectedCompany.value
+        );
+      }
+      return jobStore.jobs;
+    });
+
+    const companyNames = computed(() => {
+      return [...new Set(jobStore.jobs.map((job) => job.companyName))];
+    });
 
     const openModal = (job: JobVacancy) => {
       selectedJob.value = job;
       isModalOpen.value = true;
     };
+
+    watch(selectedCompany, (newValue) => {
+      console.log("Selected company:", newValue);
+    });
 
     return {
       jobs,
@@ -47,6 +65,8 @@ export default defineComponent({
       selectedJob,
       isModalOpen,
       openModal,
+      companyNames,
+      selectedCompany,
     };
   },
 });
@@ -56,6 +76,11 @@ export default defineComponent({
   <v-card title="Job Vacancies" flat>
     <template v-slot:text>
       <SearchField v-model:search="search" />
+      <JobVacancyFilter
+        label="Filter by Company"
+        :items="companyNames"
+        v-model="selectedCompany"
+      />
     </template>
 
     <v-data-table

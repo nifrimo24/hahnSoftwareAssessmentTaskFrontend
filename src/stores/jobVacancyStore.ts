@@ -34,10 +34,7 @@ export const useJobStore = defineStore("jobStore", {
     async fetchJobs() {
       try {
         const response = await api.getJobs();
-        this.jobs = response.data; // Asumiendo que response.data es el array de objetos de trabajo
-
-        console.log("this.jobs", this.jobs);
-        console.log("response.data", response.data);
+        this.jobs = response.data;
       } catch (error) {
         console.error("Error fetching jobs:", error);
       }
