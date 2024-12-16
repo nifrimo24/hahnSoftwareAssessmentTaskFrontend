@@ -40,6 +40,7 @@ export default defineComponent({
     ]);
     const selectedJob = ref<Job | null>(null);
     const isModalOpen = ref(false);
+    const show = ref(false);
 
     onMounted(async () => {
       await jobStore.fetchJobs();
@@ -69,6 +70,7 @@ export default defineComponent({
       isModalOpen,
       openModal,
       navigateToJobUrl,
+      show,
     };
   },
 });
@@ -124,8 +126,26 @@ export default defineComponent({
           {{ selectedJob?.annualSalaryMax }} {{ selectedJob?.currency }}
         </v-card-subtitle>
         <v-card-text>
-          <p><strong>Description:</strong> {{ selectedJob?.excerpt }}</p>
+          <p><strong>Introduction:</strong> {{ selectedJob?.excerpt }}</p>
         </v-card-text>
+
+        <v-card-actions>
+          <v-btn text="Description"></v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+            @click="show = !show"
+          ></v-btn>
+        </v-card-actions>
+        <v-expand-transition>
+          <div v-show="show">
+            <v-divider></v-divider>
+
+            <v-card-text>
+              <p v-html="selectedJob?.description"></p>
+            </v-card-text>
+          </div>
+        </v-expand-transition>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="secondary" @click="isModalOpen = false">Close</v-btn>
