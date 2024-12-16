@@ -1,30 +1,16 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, computed } from "vue";
 import { useJobStore } from "../stores/jobVacancyStore";
-
-interface Job {
-  id: number;
-  apiId: number;
-  annualSalaryMax: number;
-  annualSalaryMin: number;
-  companyId: number;
-  companyLogo: string;
-  companyName: string;
-  createdAt: string;
-  currency: string;
-  description: string;
-  excerpt: string;
-  geoLocation: string;
-  industry: string;
-  level: string;
-  postedDate: string;
-  title: string;
-  type: string;
-  url: string;
-}
+import { JobVacancy } from "../types";
+import SearchField from "./SearchField.vue";
+import JobVacancyDetailsDialog from "@/components/JobVacancyDetailsDialog.vue";
 
 export default defineComponent({
   name: "JobVacancyTable",
+  components: {
+    JobVacancyDetailsDialog,
+    SearchField,
+  },
   setup() {
     const jobStore = useJobStore();
     const isLoading = ref(true);
@@ -38,9 +24,8 @@ export default defineComponent({
       { title: "Level", key: "level" },
       { title: "Actions", key: "actions", sortable: false },
     ]);
-    const selectedJob = ref<Job | null>(null);
+    const selectedJob = ref<JobVacancy | null>(null);
     const isModalOpen = ref(false);
-    const show = ref(false);
 
     onMounted(async () => {
       await jobStore.fetchJobs();
@@ -49,16 +34,9 @@ export default defineComponent({
 
     const jobs = computed(() => jobStore.jobs);
 
-    const openModal = (job: Job) => {
+    const openModal = (job: JobVacancy) => {
       selectedJob.value = job;
       isModalOpen.value = true;
-    };
-
-    const navigateToJobUrl = () => {
-      console.log("selectedJob.value?.url", selectedJob.value?.url);
-      if (selectedJob.value?.url) {
-        window.open(selectedJob.value.url, "_blank");
-      }
     };
 
     return {
@@ -69,8 +47,6 @@ export default defineComponent({
       selectedJob,
       isModalOpen,
       openModal,
-      navigateToJobUrl,
-      show,
     };
   },
 });
@@ -79,14 +55,7 @@ export default defineComponent({
 <template>
   <v-card title="Job Vacancies" flat>
     <template v-slot:text>
-      <v-text-field
-        v-model="search"
-        label="Search"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        hide-details
-        single-line
-      ></v-text-field>
+      <SearchField v-model:search="search" />
     </template>
 
     <v-data-table
@@ -101,83 +70,10 @@ export default defineComponent({
       </template>
     </v-data-table>
 
-    <v-dialog v-model="isModalOpen" max-width="600px">
-      <v-card>
-        <v-card-title class="headline">
-          {{ selectedJob?.title }}
-        </v-card-title>
-        <v-card-subtitle>
-          <strong>Company Name:</strong>
-          {{ selectedJob?.companyName }}
-        </v-card-subtitle>
-        <v-card-subtitle>
-          <strong>Location:</strong>
-          {{ selectedJob?.geoLocation }}
-        </v-card-subtitle>
-        <v-card-subtitle>
-          <strong>Industry:</strong>
-          {{ selectedJob?.industry }}
-        </v-card-subtitle>
-        <v-card-subtitle>
-          <strong>Job Type:</strong> {{ selectedJob?.type }}
-        </v-card-subtitle>
-        <v-card-subtitle>
-          <strong>Salary Range:</strong> {{ selectedJob?.annualSalaryMin }} -
-          {{ selectedJob?.annualSalaryMax }} {{ selectedJob?.currency }}
-        </v-card-subtitle>
-        <v-card-text>
-          <p><strong>Introduction:</strong> {{ selectedJob?.excerpt }}</p>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-btn text="Description"></v-btn>
-          <v-spacer></v-spacer>
-          <v-btn
-            :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-            @click="show = !show"
-          ></v-btn>
-        </v-card-actions>
-        <v-expand-transition>
-          <div v-show="show">
-            <v-divider></v-divider>
-
-            <v-card-text>
-              <p v-html="selectedJob?.description"></p>
-            </v-card-text>
-          </div>
-        </v-expand-transition>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="secondary" @click="isModalOpen = false">Close</v-btn>
-          <v-btn @click="navigateToJobUrl" class="apply-button">
-            <v-icon left>mdi-check</v-icon>
-            Apply
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <JobVacancyDetailsDialog
+      :isModalOpen="isModalOpen"
+      :selectedJob="selectedJob"
+      @update:isModalOpen="isModalOpen = $event"
+    />
   </v-card>
 </template>
-
-<style scoped>
-.apply-button {
-  background-color: #1976d2;
-  color: white;
-  font-weight: bold;
-  border-radius: 8px;
-  padding: 10px 20px;
-  transition: background-color 0.3s ease;
-}
-
-.apply-button:hover {
-  background-color: #1565c0; /* Background color on hover */
-}
-
-.company-logo {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-</style>
