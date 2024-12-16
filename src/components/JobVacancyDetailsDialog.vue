@@ -47,7 +47,7 @@ export default defineComponent({
 
 <template>
   <v-dialog v-model="localIsModalOpen" max-width="600px">
-    <v-card>
+    <v-card class="modal-content">
       <v-card-title class="headline">
         {{ selectedJob?.title }}
       </v-card-title>
@@ -122,5 +122,16 @@ export default defineComponent({
 
 .apply-button:hover {
   background-color: #1565c0;
+}
+
+.modal-content {
+  font-family: Arial, sans-serif; /* Cambia esto al tipo de letra que prefieras */
+  padding: 20px; /* Ajusta el valor del padding según tus necesidades */
+}
+
+.modal-content .v-card-title,
+.modal-content .v-card-subtitle,
+.modal-content .v-card-text {
+  padding-bottom: 10px; /* Ajusta el valor del padding según tus necesidades */
 }
 </style>

@@ -19,12 +19,12 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const selected = ref(props.modelValue);
+    const selected = ref(props.modelValue || null);
 
     watch(
       () => props.modelValue,
       (newVal) => {
-        selected.value = newVal;
+        selected.value = newVal || null;
       }
     );
 

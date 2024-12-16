@@ -108,54 +108,54 @@ export default defineComponent({
 </script>
 
 <template>
-  <v-card title="Job Vacancies" flat>
-    <template v-slot:text>
-      <div>
-        <div class="search-container">
-          <SearchField v-model:search="search" />
-        </div>
-        <div class="filters-container">
-          <JobVacancyFilter
-            label="Filter by Company"
-            :items="companyNames"
-            v-model="selectedCompany"
-          />
-          <JobVacancyFilter
-            label="Filter by Geolocation"
-            :items="geoLocations"
-            v-model="selectedGeoLocation"
-          />
-          <JobVacancyFilter
-            label="Filter by Job Type"
-            :items="jobTypes"
-            v-model="selectedJobType"
-          />
-          <JobVacancyFilter
-            label="Filter by Industry"
-            :items="industries"
-            v-model="selectedIndustry"
-          />
-          <JobVacancyFilter
-            label="Filter by Level"
-            :items="levels"
-            v-model="selectedLevel"
-          />
-        </div>
+  <v-card flat>
+    <v-card-title class="custom-title"> Job Vacancies </v-card-title>
+    <div class="search-filters-container">
+      <div class="search-container">
+        <SearchField v-model:search="search" />
       </div>
-    </template>
-
-    <v-data-table
-      :headers="headers"
-      :items="jobs"
-      :search="search"
-      class="elevation-1"
-      :items-per-page="10"
-    >
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-btn @click="openModal(item)" color="primary">View Details</v-btn>
-      </template>
-    </v-data-table>
-
+      <div class="filters-container">
+        <JobVacancyFilter
+          label="Filter by Company"
+          :items="companyNames"
+          v-model="selectedCompany"
+        />
+        <JobVacancyFilter
+          label="Filter by Geolocation"
+          :items="geoLocations"
+          v-model="selectedGeoLocation"
+        />
+        <JobVacancyFilter
+          label="Filter by Job Type"
+          :items="jobTypes"
+          v-model="selectedJobType"
+        />
+        <JobVacancyFilter
+          label="Filter by Industry"
+          :items="industries"
+          v-model="selectedIndustry"
+        />
+        <JobVacancyFilter
+          label="Filter by Level"
+          :items="levels"
+          v-model="selectedLevel"
+        />
+      </div>
+    </div>
+    <div class="table-container">
+      <v-data-table
+        :headers="headers"
+        :items="jobs"
+        :search="search"
+        class="elevation-1"
+        :items-per-page="10"
+        header-class="bold-header"
+      >
+        <template v-slot:[`item.actions`]="{ item }">
+          <v-btn @click="openModal(item)" color="primary">View Details</v-btn>
+        </template>
+      </v-data-table>
+    </div>
     <JobVacancyDetailsDialog
       :isModalOpen="isModalOpen"
       :selectedJob="selectedJob"
@@ -165,6 +165,15 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.custom-title {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.search-filters-container {
+  padding: 1rem; /* Adjust the padding as needed */
+}
+
 .search-container {
   width: 40%;
   margin-bottom: 1rem;
@@ -175,5 +184,10 @@ export default defineComponent({
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+.table-container {
+  padding: 1rem;
+  overflow-x: auto;
 }
 </style>
