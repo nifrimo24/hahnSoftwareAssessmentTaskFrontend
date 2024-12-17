@@ -19,8 +19,9 @@ export default defineComponent({
       }
     );
 
-    const updateSearch = (value: string) => {
-      emit("update:search", value);
+    const updateSearch = (event: Event) => {
+      const input = event.target as HTMLInputElement;
+      emit("update:search", input.value);
     };
 
     return {
@@ -39,6 +40,6 @@ export default defineComponent({
     variant="outlined"
     hide-details
     single-line
-    @input="updateSearch"
+    @input="updateSearch($event)"
   ></v-text-field>
 </template>
